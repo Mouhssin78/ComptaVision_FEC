@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComptaVision - Visualisation d'écritures</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <h1>ComptaVision</h1>
+            </div>
+            <p>Traitement et Visualisation des Écritures Comptables</p>
+        </header>
+
+        <main class="app-main">
+            <section class="upload-section" id="upload-section">
+                <div class="upload-box" id="drop-area">
+                    <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                    <h2>Importer un fichier Excel</h2>
+                    <p>Glissez-déposez votre fichier .xlsx ou .xls ici ou cliquez pour parcourir</p>
+                    <input type="file" id="file-input" accept=".xlsx, .xls, .csv" hidden>
+                    <button class="btn-primary" onclick="document.getElementById('file-input').click()">Sélectionner un fichier</button>
+                </div>
+                <div id="upload-status" class="status-message"></div>
+            </section>
+
+            <div id="app-content" style="display: none;">
+                <nav class="app-nav">
+                    <ul class="nav-menu">
+                        <li><button class="nav-btn active" id="btn-view-table">Visualisation</button></li>
+                        <li><button class="nav-btn" id="btn-view-dashboard">Dashboard</button></li>
+                    </ul>
+                    <button class="btn-secondary" id="btn-reset"><i class="fa-solid fa-arrow-rotate-left"></i> Nouveau fichier</button>
+                </nav>
+
+                <section class="data-section" id="data-section">
+                    <div class="data-header">
+                        <h2 id="file-name-display">Données du fichier</h2>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table id="data-table">
+                            <thead id="table-head">
+                                <!-- Table headers will be injected here -->
+                            </thead>
+                            <tbody id="table-body">
+                                <!-- Table rows will be injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-controls" id="pagination-controls">
+                        <!-- Pagination will be injected here -->
+                    </div>
+                </section>
+
+                <section class="dashboard-section" id="dashboard-section" style="display: none;">
+                    <div class="dashboard-header">
+                        <h2>Dashboard Stratégique</h2>
+                        <div class="export-controls">
+                            <div class="date-picker-group">
+                                <div class="date-input-wrapper">
+                                    <label for="export-date-start">Du :</label>
+                                    <input type="date" id="export-date-start" class="date-input">
+                                </div>
+                                <div class="date-input-wrapper">
+                                    <label for="export-date-end">Au :</label>
+                                    <input type="date" id="export-date-end" class="date-input">
+                                </div>
+                            </div>
+                            <button class="btn-primary" id="btn-export-fec"><i class="fa-solid fa-download"></i> Exporter le FEC Anonymisé</button>
+                        </div>
+                    </div>
+                    <div class="dashboard-content">
+                        <!-- KPIs -->
+                        <div class="kpi-grid">
+                            <div class="kpi-card">
+                                <div class="kpi-icon"><i class="fa-solid fa-euro-sign"></i></div>
+                                <div class="kpi-info">
+                                    <h3>Chiffre d'Affaires Net</h3>
+                                    <p id="kpi-ca">0 €</p>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-icon"><i class="fa-solid fa-building-columns"></i></div>
+                                <div class="kpi-info">
+                                    <h3>Trésorerie Globale</h3>
+                                    <p id="kpi-treso">0 €</p>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
+                                <div class="kpi-info">
+                                    <h3>En-cours Client</h3>
+                                    <p id="kpi-client">0 €</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Page 1 -->
+                        <div class="charts-grid">
+                            <div class="chart-card">
+                                <h3 class="tooltip-container">
+                                    Résultat Net (Waterfall)
+                                    <i class="fa-solid fa-circle-info info-icon"></i>
+                                    <span class="tooltip-text">Visualise comment le Chiffre d'Affaires est consommé par les grandes masses de charges pour arriver au Résultat Net.</span>
+                                </h3>
+                                <div id="chart-waterfall" class="chart-container"></div>
+                            </div>
+                            <div class="chart-card">
+                                <h3 class="tooltip-container">
+                                    Évolution du Cash-Flow (Compte 512)
+                                    <i class="fa-solid fa-circle-info info-icon"></i>
+                                    <span class="tooltip-text">Analyse le rythme des encaissements et décaissements bancaires réels mois par mois.</span>
+                                </h3>
+                                <div id="chart-cashflow" class="chart-container"></div>
+                            </div>
+                        </div>
+
+                        <!-- PDF Page Break -->
+                        <div class="pdf-page-break"></div>
+
+                        <!-- Charts Page 2 -->
+                        <div class="charts-grid">
+                            <div class="chart-card">
+                                <h3 class="tooltip-container">
+                                    Structure des Coûts (Treemap)
+                                    <i class="fa-solid fa-circle-info info-icon"></i>
+                                    <span class="tooltip-text">Identifie immédiatement les plus gros postes de dépenses (Classe 6) proportionnellement à leurs montants.</span>
+                                </h3>
+                                <div id="chart-treemap" class="chart-container"></div>
+                            </div>
+                            <div class="chart-card">
+                                <h3 class="tooltip-container">
+                                    Balance Âgée Clients
+                                    <i class="fa-solid fa-circle-info info-icon"></i>
+                                    <span class="tooltip-text">Évalue le risque d'impayés en regroupant les factures clients non-lettrées par tranches d'ancienneté.</span>
+                                </h3>
+                                <div id="chart-aging" class="chart-container"></div>
+                            </div>
+                            <div class="chart-card full-width">
+                                <h3 class="tooltip-container">
+                                    Saisonnalité de l'Activité (CA)
+                                    <i class="fa-solid fa-circle-info info-icon"></i>
+                                    <span class="tooltip-text">Détecte les pics d'activité en superposant l'évolution du Chiffre d'Affaires de janvier à décembre pour chaque année.</span>
+                                </h3>
+                                <div id="chart-season" class="chart-container"></div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-footer" style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+                            <button class="btn-primary" id="btn-export-pdf" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                                <i class="fa-solid fa-file-pdf"></i> Exporter le Dashboard en PDF
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
