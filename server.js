@@ -26,7 +26,21 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
         const sheet = workbook.Sheets[sheetName];
         
         // Convert sheet to JSON
-        const data = xlsx.utils.sheet_to_json(sheet, { header: 1 });
+        let rawData = xlsx.utils.sheet_to_json(sheet, { header: 1 });
+        
+        // Trouver la ligne d'en-tête (cherche "JournalCode" ou "CompteNum" dans les 10 premières lignes)
+        let headerRowIndex = 0;
+        for (let i = 0; i < Math.min(20, rawData.length); i++) {
+            const row = rawData[i] || [];
+            const rowString = row.map(String).join('').toLowerCase();
+            if (rowString.includes('journalcode') || rowString.includes('comptenum')) {
+                headerRowIndex = i;
+                break;
+            }
+        }
+
+        // Isoler les données utiles (en-tête + lignes)
+        const data = rawData.slice(headerRowIndex);
         
         // Validation des colonnes
         const expectedHeaders = [
@@ -39,7 +53,12 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
         ];
         const headers = data[0] || [];
         
-        const missingHeaders = expectedHeaders.filter(h => !headers.includes(h));
+        // Normalisation pour la comparaison (minuscules et sans espaces superflus)
+        const normalize = str => String(str).trim().toLowerCase();
+        const normalizedHeaders = headers.map(normalize);
+        
+        // Filtrer les colonnes manquantes en comparant les versions normalisées
+        const missingHeaders = expectedHeaders.filter(h => !normalizedHeaders.includes(normalize(h)));
         
         if (missingHeaders.length > 0) {
             if (missingHeaders.length <= 2) {
